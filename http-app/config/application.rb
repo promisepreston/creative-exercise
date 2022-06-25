@@ -18,5 +18,8 @@ module HttpApp
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # autoload lib files
+    config.autoload_paths << Rails.root.join('lib')
   end
 end
