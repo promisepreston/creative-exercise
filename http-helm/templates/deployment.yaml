@@ -92,18 +92,6 @@ spec:
                 secretKeyRef:
                   name: http-app-secret
                   key: RAILS_MASTER_KEY
-      initContainers:
-        - name: init-http-app
-          image: busybox:1.28
-          command: ["/bin/sh","-c"]
-          args:
-          - sudo chmod 777 -R /app;
-            bundle exec rails assets:precompile;
-            bundle exec rails db:create;
-            bundle exec rails db:migrate;
-            bundle exec rails db:seed;
-            bundle exec rails server -b 0.0.0.0 -p 3000;
-            echo 'App migrations and asset compilations completed';
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

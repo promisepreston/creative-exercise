@@ -101,17 +101,7 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 5
   averageCPUUtilization: 80
-  averageMemoryUtilization: 80
-
-# postInstallJob:
-#   image: bitnami/rails:6.1.6-0-debian-11-r8
-#   command: ["/bin/sh","-c"]
-#   args:
-#   - bundle exec rails assets:precompile;
-#     bundle exec rails db:create;
-#     bundle exec rails db:migrate;
-#     bundle exec rails db:seed;
-#     bundle exec rails server -b 0.0.0.0 -p 3000
+  targetMemoryUtilizationPercentage: 80
 
 nodeSelector: {}
 
