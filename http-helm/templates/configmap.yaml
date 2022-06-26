@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.name.http }}-configmap
+  name: {{ .Values.name.http }}
   namespace: {{ .Values.namespace }}
 data:
   RAILS_ENV: "production"

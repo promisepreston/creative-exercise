@@ -15,22 +15,21 @@ containers:
   tag: latest
   command: ["/bin/sh","-c"]
   ports:
-    containerPort: 3000
     name: http
+    containerPort: 3000
     protocol: TCP
   livenessProbe:
     httpGet:
       path: /
       port: http
-    initialDelaySeconds: 300
+    initialDelaySeconds: 180
     periodSeconds: 20
   readinessProbe:
     httpGet:
       path: /
       port: http
-    initialDelaySeconds: 200
+    initialDelaySeconds: 120
     periodSeconds: 20
-
 imagePullSecrets:
   - name: docker-registry-secret
 nameOverride: ""
@@ -65,7 +64,6 @@ ingress:
   enabled: false
   annotations:
     kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
     cert-manager.io/cluster-issuer: letsencrypt-prod
   className: ""
   hosts:

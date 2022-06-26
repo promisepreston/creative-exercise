@@ -2,7 +2,7 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ .Values.name.http }}-hpa
+  name: {{ .Values.name.http }}
   namespace: {{ .Values.namespace }}
   labels:
     app: {{ .Values.name.http }}

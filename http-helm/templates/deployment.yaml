@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.name.http }}-deployment
+  name: {{ .Values.name.http }}
   namespace: {{ .Values.namespace }}
   labels:
     app: {{ .Values.name.http }}
@@ -70,27 +70,27 @@ spec:
             - name: RAILS_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: http-app-configmap
+                  name: http-app
                   key: RAILS_PORT
             - name: RAILS_ENV
               valueFrom:
                 configMapKeyRef:
-                  name: http-app-configmap
+                  name: http-app
                   key: RAILS_ENV
             - name: RAILS_LOG_TO_STDOUT
               valueFrom:
                 configMapKeyRef:
-                  name: http-app-configmap
+                  name: http-app
                   key: RAILS_LOG_TO_STDOUT
             - name: RAILS_SERVE_STATIC_FILES
               valueFrom:
                 configMapKeyRef:
-                  name: http-app-configmap
+                  name: http-app
                   key: RAILS_SERVE_STATIC_FILES
             - name: RAILS_MASTER_KEY
               valueFrom:
                 secretKeyRef:
-                  name: http-app-secret
+                  name: http-app
                   key: RAILS_MASTER_KEY
       {{- with .Values.nodeSelector }}
       nodeSelector:
