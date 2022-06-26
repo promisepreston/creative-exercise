@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name.http }}-deployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.name.http }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Values.name.http }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app: {{ .Values.name.http }}
+        {{- include "http-app.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Values.name.http }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ .Values.containers.image }}:{{ .Values.containers.tag }}
+          imagePullPolicy: {{ .Values.containers.pullPolicy }}
+          command: ["/bin/sh","-c"]
+          args:
+          - sudo chmod 777 -R /app;
+            bundle exec rails assets:precompile;
+            bundle exec rails db:create;
+            bundle exec rails db:migrate;
+            bundle exec rails db:seed;
+            bundle exec rails server -b 0.0.0.0 -p 3000;
+            echo 'The app is running!';
+          ports:
+            - name: {{ .Values.containers.ports.name }}
+              containerPort: {{ .Values.containers.ports.containerPort }}
+              protocol: {{ .Values.containers.ports.protocol }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.containers.livenessProbe.httpGet.path }}
+              port: {{ .Values.containers.livenessProbe.httpGet.port }}
+            initialDelaySeconds: {{ .Values.containers.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.containers.livenessProbe.periodSeconds }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.containers.readinessProbe.httpGet.path }}
+              port: {{ .Values.containers.readinessProbe.httpGet.port }}
+            initialDelaySeconds: {{ .Values.containers.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.containers.readinessProbe.periodSeconds }}
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+          env:
+            - name: RAILS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: http-app-configmap
+                  key: RAILS_PORT
+            - name: RAILS_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: http-app-configmap
+                  key: RAILS_ENV
+            - name: RAILS_LOG_TO_STDOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: http-app-configmap
+                  key: RAILS_LOG_TO_STDOUT
+            - name: RAILS_SERVE_STATIC_FILES
+              valueFrom:
+                configMapKeyRef:
+                  name: http-app-configmap
+                  key: RAILS_SERVE_STATIC_FILES
+            - name: RAILS_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: http-app-secret
+                  key: RAILS_MASTER_KEY
+      initContainers:
+        - name: init-http-app
+          image: busybox:1.28
+          command: ["/bin/sh","-c"]
+          args:
+          - sudo chmod 777 -R /app;
+            bundle exec rails assets:precompile;
+            bundle exec rails db:create;
+            bundle exec rails db:migrate;
+            bundle exec rails db:seed;
+            bundle exec rails server -b 0.0.0.0 -p 3000;
+            echo 'App migrations and asset compilations completed';
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -3,17 +3,15 @@ FROM ruby:3.0.1
 
 # Set Dockerfile variables
 ARG BUNDLER_VERSION=2.2.23 \
-    USER=bookstore_user
+    USER=http_user
 
 # Set environment variables
 ENV BUNDLER_VERSION=${BUNDLER_VERSION}
 
-# Expose port numbers
-EXPOSE 3000
-
 # Update apt packages
 RUN apt-get update -qq \
-    && apt-get install -y sudo
+    && apt-get install -y sudo \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create user
 RUN adduser --uid 1200 \
@@ -66,3 +64,6 @@ RUN yarn install
 
 # Copy other project files
 COPY . ./
+
+# Expose port numbers
+EXPOSE 3000

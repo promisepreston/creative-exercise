@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.name.http }}-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.name.http }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.containers.ports.containerPort }}
+      targetPort: {{ .Values.containers.ports.containerPort }}
+      protocol: {{ .Values.containers.ports.protocol }}
+      name: {{ .Values.containers.ports.name }}
+  selector:
+    app: {{ .Values.name.http }}

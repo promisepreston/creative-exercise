@@ -1,0 +1,120 @@
+# Default values for traffic-kube.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+name:
+  http: http-app
+namespace: http
+
+replicaCount: 2
+
+containers:
+  image: promisepreston/http-app
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: latest
+  command: ["/bin/sh","-c"]
+  ports:
+    containerPort: 3000
+    name: http
+    protocol: TCP
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 300
+    periodSeconds: 20
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 200
+    periodSeconds: 20
+
+imagePullSecrets:
+  - name: docker-registry-secret
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: NodePort
+
+ingress:
+  enabled: false
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  className: ""
+  hosts:
+    - host: http-app.localhost
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+  - hosts:
+    - http-app.localhost
+    secretName: http-app-tls
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 1000m
+    memory: 2048Mi
+  requests:
+    cpu: 500m
+    memory: 1024Mi
+
+capacity:
+  storage: 10Gi
+
+requests:
+  storage: 5Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  averageCPUUtilization: 80
+  averageMemoryUtilization: 80
+
+# postInstallJob:
+#   image: bitnami/rails:6.1.6-0-debian-11-r8
+#   command: ["/bin/sh","-c"]
+#   args:
+#   - bundle exec rails assets:precompile;
+#     bundle exec rails db:create;
+#     bundle exec rails db:migrate;
+#     bundle exec rails db:seed;
+#     bundle exec rails server -b 0.0.0.0 -p 3000
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

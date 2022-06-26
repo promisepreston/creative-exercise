@@ -22,7 +22,7 @@ root  ALL=(ALL:ALL) ALL
 %sudo ALL=(ALL:ALL) ALL
 
 # Allow specific members to execute any command without password
-bookstore_user ALL=(ALL) NOPASSWD: ALL
+http_user ALL=(ALL) NOPASSWD: ALL
 
 # See sudoers(5) for more information on "#include" directives:
 
